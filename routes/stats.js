@@ -29,6 +29,10 @@ router.get('/:userId', async(req,res) =>{
     const userId = req.params.userId
     const user = await User.findOne({_id: mongoose.Types.ObjectId(userId)})
     const noOfGamesPlayed = await Stat.find({user:mongoose.Types.ObjectId(userId)}).count()
+    if(noOfGamesPlayed === 0){
+        return res.json({noOfGamesPlayed:0})
+    }
+
     let averageScore = await Stat.aggregate([{ $match:{user:mongoose.Types.ObjectId(userId)}},{$group:{_id:null,averageScore:{$avg:"$score"}}}])
     averageScore = averageScore[0].averageScore
     let maxLevel = await Stat.aggregate([{$match:{user:mongoose.Types.ObjectId(userId)}},{$group:{_id:null,maxLevel:{$max:"$level"}}}])
